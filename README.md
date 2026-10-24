@@ -53,4 +53,7 @@ normalization, the general Szmidt–Urbanowicz–Zagier formula, and `b ≡ -2 (
 Software (v1.0): J. S. Farland, *KSurvey: Lean formalization of the quartic L-value survey*,
 version 1.0, Zenodo, 2026, [doi:10.5281/zenodo.23624363](https://doi.org/10.5281/zenodo.23624363).
 
-The survey itself is in `paper/`.
+Paper: J. S. Farland, *The coordinates of a quartic L-value: a formalized survey of the classical
+facts*, preprint, Zenodo, 2026, [doi:10.5281/zenodo.23624516](https://doi.org/10.5281/zenodo.23624516)
+(all versions; v1 is [doi:10.5281/zenodo.23624517](https://doi.org/10.5281/zenodo.23624517)).
+A copy is in `paper/`.
