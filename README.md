@@ -1,5 +1,7 @@
 # KSurvey (QuarticSurvey)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23624363.svg)](https://doi.org/10.5281/zenodo.23624363)
+
 Lean 4 / Mathlib formalization accompanying J. S. Farland, *The coordinates of a quartic
 L-value: a formalized survey of the classical facts*.
 
@@ -45,3 +47,10 @@ Setting: `p` prime, `χ : MulChar (ZMod p) GaussianInt` with `orderOf χ = 4`, `
 Quoted, not formalized: `N(β) = 2h*(p)` (needs class numbers of number fields), the `L(1, χ)`
 normalization, the general Szmidt–Urbanowicz–Zagier formula, and `b ≡ -2 (mod 8)` under the pin
 (needs the quartic character of 2).
+
+## Citation
+
+Software (v1.0): J. S. Farland, *KSurvey: Lean formalization of the quartic L-value survey*,
+version 1.0, Zenodo, 2026, [doi:10.5281/zenodo.23624363](https://doi.org/10.5281/zenodo.23624363).
+
+The survey itself is in `paper/`.

@@ -1,0 +1,8 @@
+{
+  "title": "KSurvey: Lean formalization of the quartic L-value survey",
+  "upload_type": "software",
+  "creators": [{ "name": "Farland, Joseph S." }],
+  "license": "Apache-2.0",
+  "keywords": ["Lean 4", "Mathlib", "quartic characters", "generalized Bernoulli numbers", "Jacobi sums", "formal verification"],
+  "description": "Lean 4 / Mathlib formalization of the elementary core of J. S. Farland, The coordinates of a quartic L-value: a formalized survey of the classical facts. The survey claims nothing new; every statement is classical and attributed in the paper. No sorry, no native_decide; standard axioms only."
+}
