@@ -13,9 +13,11 @@
     "quartic characters",
     "generalized Bernoulli numbers",
     "Jacobi sums",
-    "formal verification"
+    "formal verification",
+    "Murty-Thangadurai",
+    "power residues"
   ],
-  "description": "Lean 4 / Mathlib formalization of the elementary core of J. S. Farland, The coordinates of a quartic L-value: a formalized survey of the classical facts. The survey claims nothing new; every statement is classical and attributed in the paper. No sorry, no native_decide; standard axioms only.",
+  "description": "Lean 4 / Mathlib formalization of the elementary core of J. S. Farland, The coordinates of a quartic L-value: a formalized survey of the classical facts. Version 1.1 accompanies version 2 of the survey and adds the 2-power levels (file Levels.lean): vanishing of B_{1,psi} for even nontrivial psi and of the lower-level coset differences, integrality, pairing and parity of the coset coordinates at level 2^a, and the Murty-Thangadurai level invariant as a sum over odd exponents. The survey claims nothing new; every statement is attributed in the paper. No sorry, no native_decide; standard axioms only.",
   "related_identifiers": [
     {
       "identifier": "10.5281/zenodo.23624516",
@@ -23,5 +25,6 @@
       "scheme": "doi",
       "resource_type": "publication-preprint"
     }
-  ]
+  ],
+  "version": "v1.1"
 }

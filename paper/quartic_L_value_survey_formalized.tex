@@ -1,0 +1,611 @@
+\documentclass[11pt,reqno]{amsart}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{xcolor}
+\usepackage[expansion=false]{microtype}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{question}[theorem]{Question}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem*{remark*}{Remark}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\leg}[2]{\left(\frac{#1}{#2}\right)}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Nm}{N}
+\newcommand{\lean}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\leanline}[1]{\par\smallskip{\raggedright\leftskip=1.5em\noindent{\small\emph{Lean:} #1}\par}\smallskip}
+\emergencystretch=3em
+\newcommand{\Pstar}{\mathcal P^*}
+
+\begin{document}
+
+\title[The coordinates of a quartic $L$-value]{The coordinates of a quartic $L$-value:\\
+a formalized survey of the classical facts}
+\author{Joseph S.\ Farland}
+\date{30 October 2026 (version 2)}
+
+\begin{abstract}
+For primes $p>5$ with $p\equiv5\pmod8$, the quartic generalized Bernoulli number $\beta=B_{1,\chi_4}$ is,
+after a choice of quartic character, a Gaussian integer $k+it$. This survey collects in one place the
+classical facts about these coordinates that are otherwise spread across papers from 1976 to 2026: why
+order four is the first level at which an odd non-real character occurs at prime conductor; what the
+trace and the relative class number already determine ($k$ and $|t|$); how the normalization
+$\chi_4(2)=i$ fixes the sign of $t$ and agrees with the quartic Jacobi-sum normalization and with Hudson's
+quarter-range coordinates; and the fixed-base digit identity together with what it does not reach. A
+section on the higher $2$-power levels records, for characters of order $2^a$ modulo primes with
+$v_2(p-1)=a$, that the coset differences vanish below the top level, that the coordinates of $B_{1,\chi}$
+in the power basis are odd integers, and that their first coordinate is the trace of Murty and
+Thangadurai. Nothing in this survey is new; every statement is attributed to its source, and the one
+statement we did not find in print, the parity of the coordinates at levels $2^a\ge8$, is the argument of
+the level-four case verbatim. The elementary core (Propositions 1.1, 3.1, 3.2, 3.4 except one remark, 3.5,
+4.1 and 5.1 to 5.3, Definition 3.3, and the conjugation and reconstruction statements) is formally
+verified in Lean~4 with Mathlib; Section~\ref{sec:lean} lists what is verified and what is quoted.
+\end{abstract}
+\maketitle
+
+\section{The classical boundary}\label{sec:boundary}
+
+In 1839 Dirichlet proved that for a prime $p\equiv3\pmod4$, $p>3$, the interval $(0,p/2)$ contains more
+quadratic residues than non-residues, and that the excess is $(2-\leg2p)h(-p)$, that is, $h(-p)$ when
+$p\equiv7\pmod8$ and $3h(-p)$ when $p\equiv3\pmod8$ \cite[(1.1)]{Berndt}. The programme that grew out of this
+asks, for each interval and each class of primes, whether the corresponding character sum has constant
+sign and what class number measures it. Berndt's 1976 survey \cite{Berndt} is the systematic treatment: it
+works through intervals of length $k/3$, $k/5$, $k/6$, $k/8$, $k/10$, $k/12$, $k/16$ and $k/24$, expresses the
+sums in terms of Dirichlet $L$-values at $s=1$, translates the real cases into class numbers, and deduces
+congruences.
+
+Twice in that paper Berndt identifies the obstruction. At the sixteenth range \cite[\S10]{Berndt} the
+individual sums involve $L$-functions of complex characters, so his methods yield no conclusion about their
+signs; the theorem that follows concerns paired sums. In the closing section \cite[\S14]{Berndt} he states
+the general point: every such interval sum can be written as a linear combination of $L$-functions at
+$s=1$, but when non-real characters enter the sign argument stops. At the fifth range \cite[\S5]{Berndt} he
+names quartic characters as the obstruction to a positivity conclusion.
+
+The same boundary appears in the digit literature. Girstmair \cite[Rem.~5]{GirDecOct} treats the frequency
+of the digit $0$ in the decimal period of $1/p$ when $10$ has order $(p-1)/2$. For $p\equiv3\pmod4$ the answer
+is a combination of $h(-p)$ and $h(-5p)$. For $p\equiv1\pmod4$ the evaluation supplied by \cite[(6)]{SUZ}
+involves a first generalized Bernoulli number attached to a character of order four, and Girstmair reports
+no class-number interpretation of the individual complex value.
+
+Classical methods do not stop at this boundary. They continue to control Galois-invariant combinations,
+namely traces, norms, determinants and class-number formulas. What they do not give is an ordered sign for
+the individual quartic value, which does not collapse to a signed scalar class number in the quadratic
+manner. What is left over is the ordered pair of coordinates after the conjugation ambiguity has been
+fixed.
+
+\begin{proposition}[the first non-real odd level]\label{prop:boundary}
+Let $\chi$ be a Dirichlet character modulo a prime $p$ and suppose that $\chi$ has exact order $q>1$. For $q=2$
+the character is real. For odd $q$ (in particular $q=3$) every such character is even. At $q=4$ the character
+is odd and non-real precisely when $p\equiv5\pmod8$. Thus order four is the first character order at which an
+odd non-real character can occur at prime conductor.
+\end{proposition}
+
+\begin{proof}
+If $q$ is odd, then $\chi(-1)$ has order dividing both $q$ and $2$, hence $\chi(-1)=1$. A character of order two
+takes only the values $0$ and $\pm1$. If $\chi_4$ has order four, choose a generator $g$ of $(\Z/p\Z)^\times$ with
+$\chi_4(g)=i$. Since $-1=g^{(p-1)/2}$, $\chi_4(-1)=i^{(p-1)/2}=(-1)^{(p-1)/4}$. Hence $\chi_4$ is odd exactly when
+$(p-1)/4$ is odd, equivalently $p\equiv5\pmod8$. In that case $\chi_4$ and $\overline{\chi_4}$ are the two odd
+characters of order four and are non-real.
+\end{proof}
+\leanline{\lean{apply_neg_one_of_odd_orderOf}, \lean{apply_of_orderOf_two}, \lean{quartic_apply_neg_one},
+\lean{quartic_apply_neg_one_of_one}.}
+
+This elementary boundary is the one visible in Girstmair's coset-sum method. His sign-vector argument
+\cite{GirAbh} requires a nontrivial quadratic character among the odd characters, a condition that holds in
+the real cases but fails at index four; his 2026 survey \cite{GirSurv} accordingly treats $q=2$, $6$ and $10$
+rather than $q=4$.
+
+\section{What classical theory determines}\label{sec:classical}
+
+Throughout, $p$ is a prime with $p>5$ and $p\equiv5\pmod8$; write $\Pstar$ for this set. Let $\chi_4$ be one of the
+two primitive quartic characters modulo $p$ and set
+\[
+\beta=B_{1,\chi_4}=\frac1p\sum_{1\le n\le p-1}\chi_4(n)\,n.
+\]
+As shown in Proposition~\ref{prop:coset}, $\beta$ lies in $\Z[i]$; write $\beta=k+it$. Let $\langle x\rangle$
+denote the least nonnegative residue of $x$ modulo $p$, let $H$ be the subgroup of fourth powers modulo $p$, and,
+for $j=0,1,2,3$, put
+\[
+C_j=\{n\in(\Z/p\Z)^\times:\chi_4(n)=i^j\},\qquad S_j=\frac1p\sum_{n\in C_j}\langle n\rangle .
+\]
+Thus $C_0=H$. Up to the cyclic indexing determined by $\chi_4$, the $S_j$ are the classical coset sums and, in
+Girstmair's terminology \cite{GirAbh}, the components of the $b$-deviation vector at $b=p+1$.
+
+\emph{The $L$-value normalization.} For every nonprincipal character $\chi$, $L(0,\chi)=-B_{1,\chi}$. If $\chi$
+is primitive and odd of conductor $p$, the functional equation gives
+\[
+L(1,\overline\chi)=\frac{\pi i\,\tau(\overline\chi)}p\,B_{1,\chi},
+\]
+where $\tau(\overline\chi)$ is the Gauss sum. Thus $B_{1,\chi}$ is the algebraic normalization of the
+corresponding value at $s=1$, and the coordinates in this survey are the coordinates of that normalized quartic
+$L$-value.
+
+\subsection{Trace, norm and the relative class number}
+Let $K_p$ be the imaginary cyclic quartic subfield of $\Q(\zeta_p)$, and let $h^*(p)=h(K_p)/h(\Q(\sqrt p))$ be its
+relative class number.
+
+\begin{proposition}[the classical data]\label{prop:data}
+For $p\in\Pstar$,
+\begin{equation}\label{eq:trnorm}
+\Tr(\beta)=2k,\qquad\Nm(\beta)=k^2+t^2=2h^*(p).
+\end{equation}
+Consequently the trace and the relative class number determine $k$ and $|t|$, and the only ambiguity in the
+individual quartic value is the conjugation $t\mapsto-t$.
+\end{proposition}
+
+\begin{proof}
+The trace identity is formal from $\beta=k+it$; its occurrence as a classical digit invariant is
+\cite[Thm.~1]{MT}, restated at the $2$-power levels in \cite[Thm.~1]{GirMean} (see Proposition~\ref{prop:trace}).
+Also $\beta=(S_0-S_2)+i(S_1-S_3)$. Hudson and Williams \cite{HW81}, with proof and discussion in Hudson
+\cite[(2.3)]{Hudson}, give $h^*(p)=\frac12\bigl((S_2-S_0)^2+(S_3-S_1)^2\bigr)$. Substitution gives
+$\Nm(\beta)=2h^*(p)$. Equivalently, this is the analytic class number formula $h^*=Qw\prod(-\frac12B_{1,\chi})$
+over the two odd characters, with $Q=1$ and $w=2$.
+\end{proof}
+\leanline{the trace, as \lean{trace_eq}. The identification of the norm with $2h^*(p)$ needs class numbers of
+number fields and is quoted, not formalized.}
+
+The trace fixes the real coordinate and the relative class number fixes the absolute value of the imaginary
+coordinate, so classical theory determines the quartic value up to complex conjugation. The role of the pin
+in Section~\ref{sec:pin} is to choose between the two conjugates.
+
+The same norm structure persists in higher degree. Girstmair \cite{GirMC}, restated precisely by Ku\v{c}era
+\cite{Kucera}, expresses relative class numbers of imaginary abelian fields of prime-power conductor as group
+determinants in the coset sums, with explicit formulas up to degree ten. On the trace side, Murty and
+Thangadurai \cite[Thm.~1]{MT} show that for $r\mid p-1$, with the relevant characters odd, a digit sum of $1/p$
+is an elementary term plus a trace of first generalized Bernoulli numbers. At $r=4$ that trace is $2k$; at the
+higher $2$-power levels it is Proposition~\ref{prop:trace}.
+
+\subsection{Interval sums}
+The general evaluation underlying the interval formulas is \cite[(6)]{SUZ}: for a character $\chi$ modulo
+$M$, any multiple $N$ of $M$, any $r$ prime to $N$ and any $m\ge1$,
+\begin{equation}\label{eq:suz}
+m\,r^{m-1}\sum\chi(n)\,n^{m-1}=-B_{m,\chi}\,r^{m-1}+\frac{\overline\chi(r)}{\varphi(r)}\sum_\psi
+\overline\psi(-N)\,B_{m,\chi\psi}(N).
+\end{equation}
+Szmidt, Urbanowicz and Zagier trace this formula to Lerch \cite{Lerch}, Berndt \cite{Berndt} and Urbanowicz
+\cite{Urb}. In \eqref{eq:suz} the first sum is over $0<n<N/r$ and the second is over characters $\psi$ modulo
+$r$; $B_{m,\chi\psi}(X)=\sum_{0\le j\le m}\binom mjB_{j,\chi\psi}X^{m-j}$ is the generalized Bernoulli polynomial
+of $\chi\psi$, regarded as a character modulo $rN$, evaluated at $X=N$. In \cite{SUZ} the formula is printed with
+$\chi(r)$ and $\psi(-N)$. That form agrees with \eqref{eq:suz} whenever $\chi(r)$ and every $\psi$ modulo $r$ are
+real, which covers every application in \cite{SUZ} (quadratic $\chi$ and $r\mid24$). For non-real characters the
+conjugated form \eqref{eq:suz} is the correct one, and it is the form Girstmair applies to characters of order
+four and eight \cite[(27)]{GirMean}. For instance, with $\chi=\chi_4$ normalized as in Definition~\ref{def:pin},
+$p=13$, $N=p$, $r=2$ and $m=1$, the left side of \eqref{eq:suz} is $1+3i$.
+
+At $m=1$, $N=p$ and $r=2$, formula \eqref{eq:suz} for an odd character is the fixed-base identity
+\eqref{eq:fixed} at $b=2$: $\sum_{0<n<p/2}\chi(n)=(\overline\chi(2)-2)B_{1,\chi}$. At $m=2$ the formula gives the
+moment-weighted forms appearing in \cite[\S13]{Berndt}. The eighth- and sixteenth-range formulas in Berndt
+belong to the same linear theory as the trace above; what they do not supply is an ordering of the two
+conjugate quartic values.
+\leanline{the case $m=1$, $N=p$, $r=2$, as \lean{half_sum}. The general formula \eqref{eq:suz} is quoted.}
+
+\section{The coordinates and the pin}\label{sec:pin}
+
+\begin{proposition}[pairing and integrality]\label{prop:coset}
+For $p\in\Pstar$, the four $S_j$ are integers, $S_0+S_2=S_1+S_3=(p-1)/4$, and
+\begin{equation}\label{eq:kt}
+k=S_0-S_2,\qquad t=S_1-S_3.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Put $m=(p-1)/4$. Since $p>5$, $m>1$, so $H$ contains an element $a\ne1$; multiplication by $a$ permutes each coset
+$C_j$, so the sum of its elements is $0$ in $\F_p$, and therefore the integer sum of the least positive
+representatives in $C_j$ is divisible by $p$. Hence $S_j\in\Z$. Multiplication by a generator permutes the four
+cosets cyclically, so each has $m$ elements. Since $p\equiv5\pmod8$, $\chi_4(-1)=-1$, so $n\mapsto p-n$
+interchanges $C_j$ and $C_{j+2}$; pairing the $m$ elements gives $S_j+S_{j+2}=m$. Finally
+$B_{1,\chi_4}=S_0+iS_1-S_2-iS_3$, which gives \eqref{eq:kt}.
+\end{proof}
+\leanline{\lean{p_dvd_cosetSum}, \lean{card_class}, \lean{S_add_S_neg}, \lean{T_eq}.}
+
+\begin{proposition}[oddness]\label{prop:odd}
+For $p\in\Pstar$, $k$ and $t$ are odd integers.
+\end{proposition}
+
+\begin{proof}
+By Proposition~\ref{prop:coset}, $k=2S_0-(p-1)/4$ and $t=2S_1-(p-1)/4$. Since $(p-1)/4$ is odd, both coordinates
+are odd.
+\end{proof}
+\leanline{\lean{odd_k}, \lean{odd_t}.}
+
+There are exactly two primitive quartic characters modulo $p$, $\chi_4$ and $\overline{\chi_4}$. Conjugation fixes
+$k$ and sends $t$ to $-t$. By Proposition~\ref{prop:data} the classical invariants already determine $k$ and $|t|$,
+so the entire remaining ambiguity is the sign of the second coordinate.
+\leanline{\lean{quartic_eq_or_eq_pow_three}, \lean{k_pow_three}, \lean{t_pow_three}.}
+
+\begin{definition}[the pin]\label{def:pin}
+For $p\in\Pstar$, let $\chi_4$ be the unique quartic character satisfying $\chi_4(2)=i$. This is possible and
+unique because $p\equiv5\pmod8$ makes $2$ a quadratic non-residue, so $\chi_4(2)\in\{i,-i\}$, and the two quartic
+characters take the two values.
+\end{definition}
+\leanline{\lean{quartic_apply_two}, \lean{existsUnique_pinned}.}
+
+\begin{proposition}[the Jacobi-sum dictionary]\label{prop:jacobi}
+Let $\chi_4$ be pinned by $\chi_4(2)=i$ and write $J(\chi_4,\chi_4)=a+bi$. Then $a^2+b^2=p$, $a\equiv-1\pmod4$ and
+$b\equiv2\pmod4$. Replacing $\chi_4$ by $\overline{\chi_4}$ leaves $a$ fixed and sends $b$ to $-b$. Thus the pin on
+$\chi_4$ and the sign choice for the second coordinate of the quartic Jacobi sum are the same conjugation choice.
+\end{proposition}
+
+\begin{proof}
+This is the standard quartic Jacobi-sum evaluation \cite[Cor.~3.10]{BEW}. The norm is $|J(\chi,\chi)|^2=p$ for $\chi$
+and $\chi^2$ nontrivial. For the congruences, pair $x$ with $1-x$ in $J=\sum\chi(x)\chi(1-x)$: the fixed point
+$x=1/2$ contributes $\chi(1/4)=\chi(2)^{-2}=-1$, and the remaining terms pair off, so $J=2W-1$ where $W$ is a sum of
+$(p-3)/2$ values in $\{\pm1,\pm i\}$. Then $a=2\operatorname{Re}W-1$ and $b=2\operatorname{Im}W$ with
+$\operatorname{Re}W+\operatorname{Im}W$ odd, and $a^2+b^2=p\equiv5\pmod8$ forces $\operatorname{Im}W$ odd and
+$\operatorname{Re}W$ even. Complex conjugation commutes with the finite sum defining $J$, so
+$J(\overline{\chi_4},\overline{\chi_4})=a-bi$, and the pin chooses one of the two signs of $b$.
+\end{proof}
+\leanline{\lean{jacobiSum_norm}, \lean{jacobiSum_mod_four}, \lean{jacobiSum_pow_three}.}
+
+\begin{remark*}[the sign selected by the pin]
+If $\chi_4(2)=i$, then $b\equiv-2\pmod8$. For either quartic character $\chi$, writing $J(\chi,\chi)=a+bi$, one has
+$\chi(2)=i^{ab/2}$: the Jacobi sum of the quartic residue character $\chi_\pi$ modulo a primary prime $\pi$ of norm
+$p$ satisfies $-\chi_\pi(-1)J(\chi_\pi,\chi_\pi)=\pi$, and the supplementary law gives $(2/\pi)_4=i^{ab/2}$ for
+$\pi=a+bi$ \cite[Ch.~9]{IR}. Here $\chi(-1)=-1$, and $a+bi$ is primary because $a\equiv3\pmod4$ and
+$b\equiv2\pmod4$. Hence $\chi_4(2)=i$ exactly when $ab/2\equiv1\pmod4$; since $a\equiv3\pmod4$, this means
+$b\equiv-2\pmod8$. For $p=13$, $J(\chi_4,\chi_4)=3-2i$.
+\end{remark*}
+\leanline{not formalized; the supplementary law for the quartic character of $2$ is quoted.}
+
+\begin{proposition}[quarter-count dictionary]\label{prop:quarters}
+Let $N_r=\#\{n\in H:rp/4<n<(r+1)p/4\}$ for $0\le r\le3$, and put $A=N_0-N_3$ and $B=N_1-N_2$. Under the
+normalization $\chi_4(2)=i$, Hudson's formulas \cite[Thm.~3.1]{Hudson} give
+\begin{equation}\label{eq:hudson}
+\begin{aligned}
+S_0&=\tfrac12\bigl(\tfrac{p-1}4-\tfrac35A-\tfrac15B\bigr),&\qquad S_1&=\tfrac12\bigl(\tfrac{p-1}4-\tfrac15A+\tfrac35B\bigr),\\
+S_2&=\tfrac12\bigl(\tfrac{p-1}4+\tfrac35A+\tfrac15B\bigr),&\qquad S_3&=\tfrac12\bigl(\tfrac{p-1}4+\tfrac15A-\tfrac35B\bigr).
+\end{aligned}
+\end{equation}
+Consequently
+\begin{equation}\label{eq:ktAB}
+k=-\frac{3A+B}5,\qquad t=\frac{-A+3B}5,
+\end{equation}
+and conversely
+\begin{equation}\label{eq:ABkt}
+A=-\frac{3k+t}2,\qquad B=\frac{3t-k}2.
+\end{equation}
+Thus $(k,t)$ and the two independent quarter-range differences are equivalent data. The four individual quarter
+counts are not determined by $k$ and $t$ alone.
+\end{proposition}
+
+\begin{proof}
+Equation \eqref{eq:hudson} is \cite[Thm.~3.1]{Hudson} in the normalization $\chi_4(2)=i$. A short route to it: let
+$Q_r$ be the sum of $\chi_4$ over the $r$-th quarter of $(0,p)$. The fixed-base identity \eqref{eq:fixed} at $b=2$
+and $b=4$, with $\chi_4(2)=i$ and $\chi_4(4)=-1$, together with the reflection $Q_{3-r}=-Q_r$, gives
+$2Q_0=(-3+i)\beta$ and $2Q_1=(-1-3i)\beta$. Since $n\mapsto p-n$ carries $C_2\cap(\text{quarter }r)$ onto
+$H\cap(\text{quarter }3-r)$, $\operatorname{Re}Q_0=A$ and $\operatorname{Re}Q_1=B$. Taking real parts gives
+\eqref{eq:ABkt}; solving gives \eqref{eq:ktAB}; and \eqref{eq:ktAB} with Proposition~\ref{prop:coset} gives
+\eqref{eq:hudson}.
+\end{proof}
+\leanline{\lean{two_A}, \lean{two_B} for \eqref{eq:ABkt}, \lean{five_k}, \lean{five_t} for \eqref{eq:ktAB},
+\lean{hudson_S} for \eqref{eq:hudson}, cleared of denominators.}
+
+\begin{theorem}[reconstruction]\label{thm:recon}
+For $p\in\Pstar$, the classical invariants determine the quartic value up to conjugation, and the pin determines
+it completely. More precisely, $k=\frac12\Tr(\beta)$ and $|t|=\sqrt{2h^*(p)-k^2}$, and $\chi_4(2)=i$ selects the
+sign of $t$. With that choice, Proposition~\ref{prop:jacobi} fixes the corresponding sign of $b$ in the Jacobi sum,
+and Proposition~\ref{prop:quarters} reconstructs the quarter-range differences $A$ and $B$:
+\[
+(\Tr\beta,\ h^*(p))\ \longrightarrow\ (k,|t|)\ \xrightarrow{\ \chi_4(2)=i\ }\ (k,t)\ \longleftrightarrow\ (A,B).
+\]
+\end{theorem}
+
+\begin{proof}
+The first two assertions are Proposition~\ref{prop:data} and Definition~\ref{def:pin}. The two dictionaries are
+Propositions~\ref{prop:jacobi} and~\ref{prop:quarters}.
+\end{proof}
+\leanline{\lean{reconstruction} (every quartic $\psi$ has $k(\psi)=k(\chi_4)$ and $t(\psi)=\pm t(\chi_4)$, $\psi(2)=i$
+exactly when $\psi=\chi_4$, and $(k,t)\leftrightarrow(A,B)$); the step through $h^*(p)$ is quoted.}
+
+\begin{example}[$p=13$]\label{ex:13}
+Here $H=\{1,3,9\}$, so $(N_0,N_1,N_2,N_3)=(2,0,1,0)$, hence $A=2$ and $B=-1$. Formula \eqref{eq:ktAB} gives
+$k=t=-1$, so the pinned value is $\beta=-1-i$. Its norm is $2$, and Proposition~\ref{prop:data} gives
+$h^*(13)=1$. The example checks the integrality, parity, norm and quarter-count conventions together.
+\end{example}
+
+\section{Fixed-base and diagonal families}\label{sec:fixed}
+
+The classical digit and coset-sum identities use a fixed base $b$. Multiplication by $b$ is a bijection of
+$(\Z/p\Z)^\times$, and composing a character with that map contributes a constant factor. For $b\ge2$ with $p\nmid b$,
+put
+\[
+\theta(b;n)=\frac{b\langle n\rangle-\langle bn\rangle}p=\Bigl\lfloor\frac{bn}p\Bigr\rfloor,\qquad0<n<p.
+\]
+
+\begin{proposition}[fixed-base collapse]\label{prop:fixed}
+For a character $\chi$ modulo $p$,
+\begin{equation}\label{eq:fixed}
+\sum_{1\le n\le p-1}\overline\chi(n)\,\theta(b;n)=(b-\chi(b))\,B_{1,\overline\chi}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Since $\theta(b;n)=(bn-\langle bn\rangle)/p$, the first term contributes $bB_{1,\overline\chi}$. In the second term the
+substitution $m=\langle bn\rangle$ is a bijection of $(\Z/p\Z)^\times$ and $\overline\chi(b^{-1}m)=\chi(b)\overline\chi(m)$,
+so it contributes $\chi(b)B_{1,\overline\chi}$. Subtraction gives \eqref{eq:fixed}.
+\end{proof}
+\leanline{\lean{fixed_base_collapse}, for characters with values in any commutative ring; no parity hypothesis is
+needed.}
+
+This is the prime-conductor form of \cite[Thm.~1]{GirSurv}. The mechanism is the bijective constant-factor
+substitution. On the diagonal $\theta(n;n)=\lfloor n^2/p\rfloor$ the base moves with the summand: characters still
+satisfy $\chi(n^\ell)=\chi(n)^\ell$, but $n\mapsto n^\ell$ is $\gcd(\ell,p-1)$-to-one onto the $\ell$-th powers, not a
+bijection carrying a constant character factor, so the proof of Proposition~\ref{prop:fixed} does not apply to
+diagonal sums.
+
+\section{The higher \texorpdfstring{$2$}{2}-power levels}\label{sec:levels}
+
+The coset description of Section~\ref{sec:pin} is the level-four case of a description at every $2$-power level.
+In this section $p$ is a prime with $v_2(p-1)=a\ge2$, $g$ is a primitive root modulo $p$, and $\chi$ is a character of
+exact order $2^a$, with $\zeta=\chi(g)$ a primitive $2^a$-th root of unity. Exactly as in
+Proposition~\ref{prop:boundary}, $\chi(-1)=\zeta^{(p-1)/2}=-1$, because $(p-1)/2^a$ is odd: $\chi$ is odd. For $b\le a$
+let $H_{2^b}$ be the subgroup of $2^b$-th powers, of order $(p-1)/2^b$; the classes of $\chi$ are the cosets
+\[
+C_r=\{n:\chi(n)=\zeta^r\}=g^rH_{2^a},\qquad S_r=\frac1p\sum_{n\in C_r}\langle n\rangle\qquad(0\le r<2^a),
+\]
+and $B_{1,\chi}=\sum_r\zeta^rS_r$. At $a=2$ these are the $C_j$ and $S_j$ of Section~\ref{sec:classical}.
+
+\begin{proposition}[the lower levels vanish]\label{prop:even}
+Let $b<a$. Every coset $C$ of $H_{2^b}$ is closed under $n\mapsto-n$, so $\frac1p\sum_{n\in C}\langle n\rangle=|C|/2$, and all
+coset differences at level $2^b$ vanish. Equivalently, $B_{1,\psi}=0$ for every even character $\psi\ne1$ modulo $p$.
+\end{proposition}
+
+\begin{proof}
+Since $2^b$ divides $(p-1)/2$, $-1=g^{(p-1)/2}$ lies in $H_{2^b}$. Pairing $n$ with $p-n$ in $C$ gives $2\sum_C\langle n\rangle=|C|p$.
+For the character form, substitute $n\mapsto-n$ in $\sum\psi(n)\langle n\rangle$: it equals $\sum\psi(n)(p-\langle n\rangle)$, so
+$2\sum\psi(n)\langle n\rangle=p\sum\psi(n)=0$. This is the classical vanishing of $B_{1,\psi}$ for even $\psi\ne1$
+\cite[\S4.1]{Washington}.
+\end{proof}
+\leanline{\lean{levelSum_even} (coset form, for the classes of any even character), \lean{even_T_eq_zero}.}
+
+So among the characters of order dividing $2^a$ only those of exact order $2^a$ have nonzero $B_{1,\chi}$, and only the
+top level carries coordinates.
+
+\begin{proposition}[integrality and parity at every level]\label{prop:levels}
+Suppose that $p$ is not a Fermat prime, that is, $|H_{2^a}|=(p-1)/2^a>1$. Then the $S_r$ are integers,
+$S_r+S_{r+2^{a-1}}=|H_{2^a}|$, and
+\[
+B_{1,\chi}=\sum_{0\le r<2^{a-1}}d_r\zeta^r,\qquad d_r=S_r-S_{r+2^{a-1}},
+\]
+with every $d_r$ an odd integer.
+\end{proposition}
+
+\begin{proof}
+This is the proof of Propositions~\ref{prop:coset} and~\ref{prop:odd}. An element $c\ne1$ of $H_{2^a}$ permutes each $C_r$,
+so the sum of $C_r$ vanishes in $\F_p$ and $S_r\in\Z$. Since $\chi$ is odd, $n\mapsto p-n$ carries $C_r$ onto
+$C_{r+2^{a-1}}$, which gives the pairing; and $\zeta^{r+2^{a-1}}=-\zeta^r$ gives the expansion. Finally
+$d_r=2S_r-|H_{2^a}|$ with $|H_{2^a}|$ odd: a subgroup of the cyclic group $(\Z/p\Z)^\times$ of even order would contain its
+element of order two, which is $-1$, and $\chi(-1)=-1\ne1$.
+\end{proof}
+\leanline{\lean{p_dvd_levelSum}, \lean{levelSum_add_neg}, \lean{level_parity}; the oddness of $|H_{2^a}|$ is
+\lean{card_kernel_odd}.}
+
+At a Fermat prime the subgroup is trivial and integrality fails: at $p=17$, $a=4$, one has
+$d_0=2\cdot\frac1{17}-1=-\frac{15}{17}$. The integrality of coset sums of a nontrivial subgroup is classical
+\cite{GirAbh,GirSurv}, and so is the parity at level four (Proposition~\ref{prop:odd}); we have not found the parity at
+the levels $2^a\ge8$ stated in print, and record it only because the argument is the level-four one verbatim.
+
+\begin{proposition}[the level invariant; Murty and Thangadurai]\label{prop:trace}
+Let $K_{2^a}=\frac2p\sum_{n\in H_{2^a}}\langle n\rangle-|H_{2^a}|$. Then
+\[
+K_{2^a}=d_0=2^{1-a}\Tr_{\Q(\zeta_{2^a})/\Q}B_{1,\chi}.
+\]
+In particular $K_4=k$, and $K_{2^a}$ is an odd integer when $p$ is not a Fermat prime.
+\end{proposition}
+
+\begin{proof}
+The conjugates of $B_{1,\chi}$ are the $B_{1,\chi^u}$ for odd $u$ modulo $2^a$, so the trace is
+$\frac1p\sum_n\langle n\rangle\sum_{u\ \mathrm{odd}}\chi(n)^u$. For $z=\chi(n)$ a $2^a$-th root of unity,
+$\sum_{w<2^{a-1}}z^{2w+1}=z\sum_w(z^2)^w$ is $2^{a-1}$ if $z=1$, $-2^{a-1}$ if $z=-1$, and $0$ otherwise. Hence the trace is
+$2^{a-1}(S_0-S_{2^{a-1}})=2^{a-1}d_0$, and $d_0=2S_0-|H_{2^a}|=K_{2^a}$ by the pairing.
+\end{proof}
+\leanline{\lean{level_trace}, in the form $\sum_{w<2^{a-1}}\sum_n\chi^{2w+1}(n)\langle n\rangle=2^{a-1}(pS_0-pS_{2^{a-1}})$; the
+identification of the sum over odd exponents with the field trace is the classical description of the Galois
+conjugates of $B_{1,\chi}$.}
+
+This is Theorem~1 of Murty and Thangadurai \cite{MT}, there read as a statement about the digits of $1/p$, and restated at
+the $2$-power levels by Girstmair \cite[Thm.~1]{GirMean}. At $a=2$ it is the trace in \eqref{eq:trnorm}; at level two, for
+$p\equiv3\pmod4$ and $p>3$, the same coset sum is $K_2=B_{1,\leg\cdot p}=-h(-p)$.
+
+\begin{example}[levels eight]\label{ex:eight}
+At $p=41$ ($a=3$), $H_8=\{1,10,16,18,37\}$ has sum $82=2\cdot41$, so $K_8=2\cdot2-5=-1$. At $p=73$ ($a=3$),
+$H_8=\{1,2,4,8,16,32,37,55,64\}$ has sum $219=3\cdot73$, so $K_8=6-9=-3$; with the primitive root $g=5$ and
+$\chi(5)=\zeta_8$, the coordinates are $(d_0,d_1,d_2,d_3)=(-3,-3,3,1)$, all odd.
+\end{example}
+
+Beyond these facts the higher levels enter the eighth- and sixteenth-range sums through \eqref{eq:suz} at $r=8$ and
+$r=16$, together with Bernoulli numbers of twists of conductor $8p$ and $16p$ \cite[\S10]{Berndt}, \cite{GirMean}; as at
+level four, these linear formulas do not order the conjugates.
+
+\clearpage
+\section{Attribution register}\label{sec:register}
+
+The register records the classical inputs used above.
+
+\begin{center}\small
+\begin{tabular}{p{0.5\textwidth}p{0.42\textwidth}}
+\toprule
+statement & source\\
+\midrule
+quadratic excess on $(0,p/2)$ and $(0,p/4)$ & Dirichlet 1839; see \cite[(1.1), (1.2)]{Berndt}\\
+interval sums as linear combinations of $L(1,\chi\psi)$, every modulus and moment & \cite[(6)]{SUZ}, after Lerch \cite{Lerch},
+Berndt \cite{Berndt}, Urbanowicz \cite{Urb}; conjugated form as in \cite[(27)]{GirMean}\\
+eighth- and sixteenth-range character sums & \cite[\S7, \S10]{Berndt}\\
+moment-weighted interval sums & \cite[\S13]{Berndt}; equation \eqref{eq:suz} at $m\ge2$\\
+relative class number as a group determinant in coset sums, through degree ten & \cite{GirMC}, restated in \cite{Kucera}\\
+relative class number of the prime-conductor quartic field in coset sums & Hudson--Williams \cite{HW81}; proof in Hudson
+\cite[\S2]{Hudson}\\
+quarter-count / coset-sum conversion in the quartic case & Hudson \cite[Thm.~3.1]{Hudson}\\
+quartic Jacobi-sum normalization $a^2+b^2=p$, $a\equiv-1\pmod4$ & \cite[Cor.~3.10]{BEW}\\
+sign of $b$ selected by the pin: $b\equiv-2\pmod8$, i.e.\ $\chi(2)=i^{ab/2}$ & supplementary law for $2$; \cite[Ch.~9]{IR}\\
+coset-sum family and deviation vector; norm-type $L$-value product & \cite{GirAbh}, surveyed in \cite{GirSurv}\\
+digits of $1/p$ and $h(-p)$ & \cite{GirDig}; \cite[Satz 11]{GirPer}\\
+trace of first generalized Bernoulli numbers in the digit formula & \cite[Thm.~1]{MT}; \cite[Thm.~1]{GirMean}\\
+$B_{1,\psi}=0$ for even $\psi\ne1$ & \cite[\S4.1]{Washington}\\
+integrality of coset sums of a nontrivial subgroup & \cite{GirAbh}, \cite{GirSurv}\\
+parity of the coordinates at levels $2^a\ge8$ & argument of Proposition~\ref{prop:odd}; not found in print\\
+fixed-base twisted digit identity \eqref{eq:fixed} & \cite[Thm.~1]{GirSurv}\\
+digit frequencies as class numbers and classification of when this is possible & \cite{GirDecOct}; \cite{GirFreq}\\
+digit variance and Dedekind sums & \cite{GirVar97}; \cite{GirVar26}; \cite{GirMean}\\
+$p\equiv1\pmod4$ digit symmetry via composite discriminant & \cite{CK}\\
+quadratic residue counts in arithmetic progressions via the class-number formula & \cite{CRST}\\
+absence of bias in the function-field analogue & \cite{Rudnick}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Formalization}\label{sec:lean}
+
+The accompanying Lean~4 development \lean{QuarticSurvey} (Lean \texttt{v4.35.0}, Mathlib \texttt{v4.35.0};
+\url{https://github.com/jkfarland-bot/KSurvey}, release v1.1, archived on Zenodo, all versions
+\href{https://doi.org/10.5281/zenodo.23624362}{doi:10.5281/zenodo.23624362}) works with characters
+$\chi:\Z/p\Z\to\Z[i]$ of order four, written \lean{MulChar (ZMod p) GaussianInt}, and, for Section~\ref{sec:levels},
+with complex-valued characters \texttt{MulChar (ZMod p)}~$\mathbb C$, and with sums over least nonnegative residues. It contains no
+\texttt{sorry} and no \texttt{native\_decide}, and every result below depends only on the axioms \texttt{propext},
+\texttt{Classical.choice} and \texttt{Quot.sound}. The hypotheses are those of the text: $p$ prime, $p\equiv5\pmod8$, and
+$p>5$ where the coset sums enter. In Section~\ref{sec:levels} the hypotheses are stated without $a$: $\chi(-1)=-1$ for
+oddness, and $\chi^m=1$ for some $0<m<p-1$ in place of ``$p$ is not a Fermat prime'' (this gives a nontrivial kernel).
+
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+statement & Lean & file\\
+\midrule
+Prop.~\ref{prop:boundary}, odd orders are even & \lean{apply_neg_one_of_odd_orderOf} & Basic\\
+Prop.~\ref{prop:boundary}, order two is real & \lean{apply_of_orderOf_two} & Basic\\
+Prop.~\ref{prop:boundary}, order four: odd iff $p\equiv5\pmod8$ & \lean{quartic_apply_neg_one}, & Basic\\
+ & \lean{quartic_apply_neg_one_of_one} & \\
+$\chi_4(2)=\pm i$ & \lean{quartic_apply_two} & Basic\\
+Def.~\ref{def:pin}, the pin exists and is unique & \lean{existsUnique_pinned} & Pin\\
+the two quartic characters are $\chi_4$ and $\overline{\chi_4}$ & \lean{quartic_eq_or_eq_pow_three} & Pin\\
+Prop.~\ref{prop:coset}, integrality & \lean{p_dvd_cosetSum} & CosetSums\\
+Prop.~\ref{prop:coset}, class sizes $(p-1)/4$ & \lean{card_class} & CosetSums\\
+Prop.~\ref{prop:coset}, pairing $S_j+S_{j+2}=(p-1)/4$ & \lean{S_add_S_neg} & CosetSums\\
+Prop.~\ref{prop:coset}, $\beta=k+it$ & \lean{T_eq} & CosetSums\\
+Prop.~\ref{prop:odd}, oddness & \lean{odd_k}, \lean{odd_t} & CosetSums\\
+conjugation fixes $k$, negates $t$ & \lean{k_pow_three}, \lean{t_pow_three} & CosetSums\\
+Prop.~\ref{prop:data}, trace & \lean{trace_eq} & Reconstruction\\
+Prop.~\ref{prop:jacobi}, $a^2+b^2=p$ & \lean{jacobiSum_norm} & Jacobi\\
+Prop.~\ref{prop:jacobi}, $a\equiv-1$, $b\equiv2\pmod4$ & \lean{jacobiSum_mod_four} & Jacobi\\
+Prop.~\ref{prop:jacobi}, $J(\overline\chi,\overline\chi)=\overline{J(\chi,\chi)}$ & \lean{jacobiSum_pow_three} & Jacobi\\
+Prop.~\ref{prop:quarters}, \eqref{eq:ABkt}, \eqref{eq:ktAB}, \eqref{eq:hudson} & \lean{two_A}, \lean{two_B}, \lean{five_k}, \lean{five_t}, & Quarters\\
+ & \lean{hudson_S} & \\
+Thm.~\ref{thm:recon}, formal part & \lean{reconstruction} & Reconstruction\\
+Prop.~\ref{prop:fixed} & \lean{fixed_base_collapse} & FixedBase\\
+\eqref{eq:suz} at $m=1$, $N=p$, $r=2$ & \lean{half_sum} & FixedBase\\
+Prop.~\ref{prop:even}, character and coset forms & \lean{even_T_eq_zero}, \lean{levelSum_even} & Levels\\
+Prop.~\ref{prop:levels}, integrality and pairing & \lean{p_dvd_levelSum}, \lean{levelSum_add_neg} & Levels\\
+Prop.~\ref{prop:levels}, parity & \lean{level_parity}, \lean{card_kernel_odd} & Levels\\
+Prop.~\ref{prop:trace} & \lean{level_trace} & Levels\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Quoted and not formalized: the identification $\Nm(\beta)=2h^*(p)$ in Proposition~\ref{prop:data}, which needs relative class
+numbers of number fields; the $L$-value normalization of Section~\ref{sec:classical}; the general formula \eqref{eq:suz};
+the Remark $b\equiv-2\pmod8$, which needs the quartic character of $2$; the identification of the sum over odd exponents
+with the field trace in Proposition~\ref{prop:trace}; and the numerical Examples~\ref{ex:13} and~\ref{ex:eight}, which are
+checked by direct computation.
+
+\section{Questions}\label{sec:questions}
+
+These record gaps in the literature as found, not claims.
+
+\begin{question}
+Berndt's pairing at the sixteenth range \cite[\S10]{Berndt} and the pairing that appears in coordinate congruences at
+level eight both arise when characters of order greater than two enter. Is there a uniform statement of this pairing
+across the $2$-power levels?
+\end{question}
+
+\begin{question}
+Does the quartic-order Bernoulli number in \cite[Rem.~5]{GirDecOct}, of conductor $5p$, admit a coordinate description
+analogous to the prime-conductor case: a Galois-invariant coordinate determined before pinning and a complementary
+coordinate with a natural arithmetic normalization?
+\end{question}
+
+\begin{question}
+Berndt \cite[\S14]{Berndt} reports, as a written communication from Elliott, that for characters $\chi_p$ of fixed order
+in a residue class the values $\arg L(1,\chi_p)$ are everywhere dense modulo $2\pi$. What is the published form of that
+result?
+\end{question}
+
+\begin{thebibliography}{99}
+
+\bibitem{Berndt} B.~C.~Berndt, \emph{Classical theorems on quadratic residues}, Enseign.\ Math.\ (2) \textbf{22} (1976),
+261--304.
+
+\bibitem{CK} K.~Chakraborty and K.~Krishnamoorthy, \emph{On some symmetries of the base $n$ expansion of $1/m$: the class
+number connection}, Pacific J.\ Math.\ \textbf{319} (2022), 39--53.
+
+\bibitem{CRST} J.~Chattopadhyay, B.~Roy, S.~Sarkar and R.~Thangadurai, \emph{Distribution of residues modulo $p$ using the
+Dirichlet's class number formula}, arXiv:1810.00227 (2019).
+
+\bibitem{GirMC} K.~Girstmair, \emph{The relative class numbers of imaginary cyclic fields of degrees $4$, $6$, $8$ and
+$10$}, Math.\ Comp.\ \textbf{61} (1993), 881--887.
+
+\bibitem{GirDig} K.~Girstmair, \emph{The digits of $1/p$ in connection with class number factors}, Acta Arith.\ \textbf{67}
+(1994), 381--386.
+
+\bibitem{GirPer} K.~Girstmair, \emph{Periodische Dezimalbr\"uche -- was nicht jeder dar\"uber wei\ss}, Jahrbuch \"Uberblicke
+Mathematik 1995, Vieweg, Braunschweig, 1995, 163--179.
+
+\bibitem{GirAbh} K.~Girstmair, \emph{Class number factors and distribution of residues}, Abh.\ Math.\ Sem.\ Univ.\ Hamburg
+\textbf{67} (1997), 65--104.
+
+\bibitem{GirVar97} K.~Girstmair, \emph{Digit variance and Dedekind sums}, J.\ Number Theory \textbf{65} (1997), 197--205.
+
+\bibitem{GirDecOct} K.~Girstmair, \emph{On the decimal and octal digits of $1/p$}, Arch.\ Math.\ (Basel), to appear;
+arXiv:2510.07873.
+
+\bibitem{GirMean} K.~Girstmair, \emph{Mean values and variances of the digits of $1/p$}, arXiv:2606.29930 (2026).
+
+\bibitem{GirSurv} K.~Girstmair, \emph{Power residues, digit expansions, and relative class numbers}, Surveys Math.\ Appl.\
+\textbf{21} (2026), 157--176.
+
+\bibitem{GirFreq} K.~Girstmair, \emph{Digit frequencies and class numbers}, arXiv:2606.04512 (2026).
+
+\bibitem{GirVar26} K.~Girstmair, \emph{On the variance of the digits of $1/p$}, Ramanujan J.\ \textbf{70} (2026), Art.~27.
+
+\bibitem{HW81} R.~H.~Hudson and K.~S.~Williams, \emph{A class number formula for certain quartic fields}, Carleton
+Mathematical Series No.~174, Department of Mathematics and Statistics, Carleton University, Ottawa, 1981.
+
+\bibitem{Hudson} R.~H.~Hudson, \emph{Class numbers of imaginary cyclic quartic fields and related quaternary systems},
+Pacific J.\ Math.\ \textbf{115} (1984), 129--142.
+
+\bibitem{Kucera} R.~Ku\v{c}era, \emph{Formulae for the relative class number of an imaginary abelian field in the form of a
+determinant}, Nagoya Math.\ J.\ \textbf{163} (2001), 167--191.
+
+\bibitem{Lerch} M.~Lerch, \emph{Essai sur le calcul du nombre de classes de formes quadratiques binaires aux coefficients
+entiers}, Acta Math.\ \textbf{29} (1905), 333--424.
+
+\bibitem{MT} M.~R.~Murty and R.~Thangadurai, \emph{The class number of $\Q(\sqrt{-p})$ and digits of $1/p$}, Proc.\ Amer.\
+Math.\ Soc.\ \textbf{139} (2011), 1277--1289.
+
+\bibitem{BEW} B.~C.~Berndt, R.~J.~Evans and K.~S.~Williams, \emph{Sums of Gauss, Jacobi, and Jacobsthal}, J.\ Number
+Theory \textbf{11} (1979), 349--398.
+
+\bibitem{Rudnick} Z.~Rudnick, \emph{On the sum of digits of $1/M$ in $\F_q[x]$}, arXiv:2108.10142 (2021).
+
+\bibitem{SUZ} J.~Szmidt, J.~Urbanowicz and D.~Zagier, \emph{Congruences among generalized Bernoulli numbers}, Acta Arith.\
+\textbf{71} (1995), 273--278.
+
+\bibitem{Urb} J.~Urbanowicz, \emph{Connections between $B_{2,\chi}$ for even quadratic Dirichlet characters $\chi$ and class
+numbers of appropriate imaginary quadratic fields I}, Compositio Math.\ \textbf{75} (1990), 247--270.
+
+\bibitem{IR} K.~Ireland and M.~Rosen, \emph{A Classical Introduction to Modern Number Theory}, 2nd ed., Graduate Texts in
+Mathematics 84, Springer, New York, 1990.
+
+\bibitem{Washington} L.~C.~Washington, \emph{Introduction to Cyclotomic Fields}, 2nd ed., Graduate Texts in Mathematics 83,
+Springer, New York, 1997.
+
+\end{thebibliography}
+
+\end{document}
