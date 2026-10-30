@@ -17,10 +17,12 @@ Let `χ` be a character modulo a prime `p` with complex values. For a value `z` 
 * **Parity at every level** (`level_parity`). If moreover `χ^m = 1` with `0 < m < p - 1`, the
   coordinate `d_z = (∑_{C_z} n - ∑_{C_{-z}} n)/p` is an odd integer for every value `z = χ(x)`,
   `x ≠ 0`: the kernel has odd order because it does not contain `-1`.
-* **The level invariant** (`level_trace`). If `χ(-1) = -1` and `χ^{2M} = 1`, then
+* **The power-basis expansion** (`level_expansion`). If `χ^{2M} = 1` and `ζ` is a primitive
+  `2M`-th root of unity, then `∑ χ(n) n = ∑_{r<M} (∑_{C_{ζ^r}} n - ∑_{C_{-ζ^r}} n) ζ^r`.
+* **The level invariant** (`level_trace`). If `χ^{2M} = 1` (no parity hypothesis is needed), then
   `∑_{w < M} ∑_n χ^{2w+1}(n) n = M (∑_{C_1} n - ∑_{C_{-1}} n)`. For `χ` of exact order `2^a` and
   `M = 2^{a-1}` the left side is `p` times the trace of `B_{1,χ}` from `ℚ(ζ_{2^a})` to `ℚ`, so
-  `2^{1-a} Tr B_{1,χ} = d_1` (Murty and Thangadurai).
+  `2^{1-a} Tr B_{1,χ} = d_0` (Murty and Thangadurai).
 -/
 
 namespace QuarticSurvey
@@ -259,7 +261,7 @@ lemma geom_odd (M : ℕ) {z : ℂ} (hz : z ^ (2 * M) = 1) :
     have h3 : z ≠ -1 := fun h => h2 (by rw [h]; norm_num)
     simp [h1, h3]
 
-/-- **The level invariant** (Murty and Thangadurai). If `χ` is odd and `χ^{2M} = 1`, then
+/-- **The level invariant** (Murty and Thangadurai). If `χ^{2M} = 1`, then
 `∑_{w<M} ∑_n χ^{2w+1}(n) n = M (∑_{C_1} n - ∑_{C_{-1}} n)`. -/
 theorem level_trace (χ : MulChar (ZMod p) ℂ) {M : ℕ} (hM : χ ^ (2 * M) = 1) :
     ∑ w ∈ range M, T (χ ^ (2 * w + 1)) = (M : ℂ) * ((levelSum χ 1 - levelSum χ (-1) : ℤ) : ℂ) := by
@@ -284,5 +286,49 @@ theorem level_trace (χ : MulChar (ZMod p) ℂ) {M : ℕ} (hM : χ ^ (2 * M) = 1
   rw [← Finset.mul_sum, Finset.sum_sub_distrib, levelSum_eq_sum_ite, levelSum_eq_sum_ite]
   push_cast
   congr 2
+
+/-! ### The power-basis expansion -/
+
+/-- **The power-basis expansion.** If `χ^{2M} = 1` and `ζ` is a primitive `2M`-th root of unity,
+then `∑_n χ(n) n = ∑_{r<M} (∑_{C_{ζ^r}} n - ∑_{C_{-ζ^r}} n) ζ^r`. For `χ` of exact order `2^a`,
+`M = 2^{a-1}` and `ζ = χ(g)`, the coefficients are `p d_r`. -/
+theorem level_expansion (χ : MulChar (ZMod p) ℂ) {M : ℕ} (hM0 : 0 < M) (hM : χ ^ (2 * M) = 1)
+    {ζ : ℂ} (hζ : IsPrimitiveRoot ζ (2 * M)) :
+    T χ = ∑ r ∈ range M, ((levelSum χ (ζ ^ r) - levelSum χ (-ζ ^ r) : ℤ) : ℂ) * ζ ^ r := by
+  haveI : NeZero (2 * M) := ⟨by omega⟩
+  have hroot : ∀ n : ZMod p, n ≠ 0 → χ n ^ (2 * M) = 1 := by
+    intro n hn
+    rw [← MulChar.pow_apply' χ (by omega), hM, MulChar.one_apply (Ne.isUnit hn)]
+  have hhalf : ζ ^ M = -1 := by
+    have hsq : ζ ^ M * ζ ^ M = 1 := by rw [← pow_add, ← two_mul, hζ.pow_eq_one]
+    rcases mul_self_eq_one_iff.1 hsq with h | h
+    · exfalso
+      have := (hζ.pow_eq_one_iff_dvd M).1 h
+      have := Nat.le_of_dvd hM0 this
+      omega
+    · exact h
+  -- Step 1: expansion over all `2M` powers.
+  have step1 : T χ = ∑ r ∈ range (2 * M), ((levelSum χ (ζ ^ r) : ℤ) : ℂ) * ζ ^ r := by
+    unfold T levelSum
+    simp_rw [Finset.sum_filter]
+    push_cast
+    simp_rw [Finset.sum_mul]
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun n _ => ?_
+    by_cases hn : n = 0
+    · subst hn; simp
+    · obtain ⟨r, hr, hrn⟩ := hζ.eq_pow_of_pow_eq_one (hroot n hn)
+      rw [Finset.sum_eq_single r]
+      · rw [← hrn]; simp [mul_comm]
+      · intro r' hr' hne
+        have hc : χ n ≠ ζ ^ r' :=
+          fun h => hne (hζ.pow_inj (Finset.mem_range.1 hr') hr (by rw [← h, hrn]))
+        simp [hc]
+      · intro h; exact absurd (Finset.mem_range.2 hr) h
+  rw [step1, two_mul, Finset.sum_range_add, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun r _ => ?_
+  rw [pow_add, hhalf]
+  push_cast
+  ring
 
 end QuarticSurvey

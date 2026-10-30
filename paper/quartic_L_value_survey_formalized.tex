@@ -41,11 +41,11 @@ trace and the relative class number already determine ($k$ and $|t|$); how the n
 $\chi_4(2)=i$ fixes the sign of $t$ and agrees with the quartic Jacobi-sum normalization and with Hudson's
 quarter-range coordinates; and the fixed-base digit identity together with what it does not reach. A
 section on the higher $2$-power levels records, for characters of order $2^a$ modulo primes with
-$v_2(p-1)=a$, that the coset differences vanish below the top level, that the coordinates of $B_{1,\chi}$
-in the power basis are odd integers, and that their first coordinate is the trace of Murty and
-Thangadurai. Nothing in this survey is new; every statement is attributed to its source, and the one
-statement we did not find in print, the parity of the coordinates at levels $2^a\ge8$, is the argument of
-the level-four case verbatim. The elementary core (Propositions 1.1, 3.1, 3.2, 3.4 except one remark, 3.5,
+$v_2(p-1)=a$, that the coset differences vanish below the top level, that for $p$ not a Fermat prime the
+coordinates of $B_{1,\chi}$ in the power basis are odd integers, and that their first coordinate is the trace
+of Murty and Thangadurai. Nothing in this survey is new; every statement is attributed to its source. The
+one statement we did not find in print, the parity of the coordinates other than the first at levels
+$2^a\ge8$, is the argument of the level-four case verbatim. The elementary core (Propositions 1.1, 3.1, 3.2, 3.4 except one remark, 3.5,
 4.1 and 5.1 to 5.3, Definition 3.3, and the conjugation and reconstruction statements) is formally
 verified in Lean~4 with Mathlib; Section~\ref{sec:lean} lists what is verified and what is quoted.
 \end{abstract}
@@ -346,27 +346,27 @@ diagonal sums.
 The coset description of Section~\ref{sec:pin} is the level-four case of a description at every $2$-power level.
 In this section $p$ is a prime with $v_2(p-1)=a\ge2$, $g$ is a primitive root modulo $p$, and $\chi$ is a character of
 exact order $2^a$, with $\zeta=\chi(g)$ a primitive $2^a$-th root of unity. Exactly as in
-Proposition~\ref{prop:boundary}, $\chi(-1)=\zeta^{(p-1)/2}=-1$, because $(p-1)/2^a$ is odd: $\chi$ is odd. For $b\le a$
-let $H_{2^b}$ be the subgroup of $2^b$-th powers, of order $(p-1)/2^b$; the classes of $\chi$ are the cosets
+Proposition~\ref{prop:boundary}, $\chi(-1)=\zeta^{(p-1)/2}=-1$, because $(p-1)/2^a$ is odd: $\chi$ is odd. For $c\le a$
+let $H_{2^c}$ be the subgroup of $2^c$-th powers, of order $(p-1)/2^c$; the classes of $\chi$ are the cosets
 \[
 C_r=\{n:\chi(n)=\zeta^r\}=g^rH_{2^a},\qquad S_r=\frac1p\sum_{n\in C_r}\langle n\rangle\qquad(0\le r<2^a),
 \]
-and $B_{1,\chi}=\sum_r\zeta^rS_r$. At $a=2$ these are the $C_j$ and $S_j$ of Section~\ref{sec:classical}.
+and $B_{1,\chi}=\sum_r\zeta^rS_r$. At $a=2$, with $g$ chosen so that $\chi(g)=i$, these are the $C_j$ and $S_j$ of Section~\ref{sec:classical}.
 
 \begin{proposition}[the lower levels vanish]\label{prop:even}
-Let $b<a$. Every coset $C$ of $H_{2^b}$ is closed under $n\mapsto-n$, so $\frac1p\sum_{n\in C}\langle n\rangle=|C|/2$, and all
-coset differences at level $2^b$ vanish. Equivalently, $B_{1,\psi}=0$ for every even character $\psi\ne1$ modulo $p$.
+Let $c<a$. Every coset $C$ of $H_{2^c}$ is closed under $n\mapsto-n$, so $\frac1p\sum_{n\in C}\langle n\rangle=|C|/2$, and all
+coset differences at level $2^c$ vanish. More generally, $B_{1,\psi}=0$ for every even character $\psi\ne1$ modulo $p$.
 \end{proposition}
 
 \begin{proof}
-Since $2^b$ divides $(p-1)/2$, $-1=g^{(p-1)/2}$ lies in $H_{2^b}$. Pairing $n$ with $p-n$ in $C$ gives $2\sum_C\langle n\rangle=|C|p$.
+Since $2^c$ divides $(p-1)/2$, $-1=g^{(p-1)/2}$ lies in $H_{2^c}$. Pairing $n$ with $p-n$ in $C$ gives $2\sum_C\langle n\rangle=|C|p$.
 For the character form, substitute $n\mapsto-n$ in $\sum\psi(n)\langle n\rangle$: it equals $\sum\psi(n)(p-\langle n\rangle)$, so
 $2\sum\psi(n)\langle n\rangle=p\sum\psi(n)=0$. This is the classical vanishing of $B_{1,\psi}$ for even $\psi\ne1$
-\cite[\S4.1]{Washington}.
+\cite[Ch.~4]{Washington}.
 \end{proof}
 \leanline{\lean{levelSum_even} (coset form, for the classes of any even character), \lean{even_T_eq_zero}.}
 
-So among the characters of order dividing $2^a$ only those of exact order $2^a$ have nonzero $B_{1,\chi}$, and only the
+So among the nontrivial characters of order dividing $2^a$ only those of exact order $2^a$ have nonzero $B_{1,\chi}$, and only the
 top level carries coordinates.
 
 \begin{proposition}[integrality and parity at every level]\label{prop:levels}
@@ -385,13 +385,17 @@ $C_{r+2^{a-1}}$, which gives the pairing; and $\zeta^{r+2^{a-1}}=-\zeta^r$ gives
 $d_r=2S_r-|H_{2^a}|$ with $|H_{2^a}|$ odd: a subgroup of the cyclic group $(\Z/p\Z)^\times$ of even order would contain its
 element of order two, which is $-1$, and $\chi(-1)=-1\ne1$.
 \end{proof}
-\leanline{\lean{p_dvd_levelSum}, \lean{levelSum_add_neg}, \lean{level_parity}; the oddness of $|H_{2^a}|$ is
-\lean{card_kernel_odd}.}
+\leanline{\lean{p_dvd_levelSum}, \lean{levelSum_add_neg} with \lean{card_level_eq} for the pairing,
+\lean{level_expansion} for the expansion (for any primitive $2^a$-th root of unity $\zeta$), \lean{level_parity}; the
+oddness of $|H_{2^a}|$ is \lean{card_kernel_odd}. The classes are handled as fibres $\{\chi=z\}$; their identification
+with the cosets $g^rH_{2^a}$ is not formalized.}
 
 At a Fermat prime the subgroup is trivial and integrality fails: at $p=17$, $a=4$, one has
 $d_0=2\cdot\frac1{17}-1=-\frac{15}{17}$. The integrality of coset sums of a nontrivial subgroup is classical
-\cite{GirAbh,GirSurv}, and so is the parity at level four (Proposition~\ref{prop:odd}); we have not found the parity at
-the levels $2^a\ge8$ stated in print, and record it only because the argument is the level-four one verbatim.
+\cite{GirAbh,GirSurv}, and so is the parity at level four (Proposition~\ref{prop:odd}). At every level the parity of
+the first coordinate $d_0$ is in Girstmair \cite[remark after Thm.~1]{GirMeanVal}, where
+$\sum_{\chi^2(k)=1}k\chi(k)=pd_0$ is shown to be odd. We have not found the parity of the other coordinates at the
+levels $2^a\ge8$ stated in print, and record it only because the argument is the level-four one verbatim.
 
 \begin{proposition}[the level invariant; Murty and Thangadurai]\label{prop:trace}
 Let $K_{2^a}=\frac2p\sum_{n\in H_{2^a}}\langle n\rangle-|H_{2^a}|$. Then
@@ -409,21 +413,24 @@ $2^{a-1}(S_0-S_{2^{a-1}})=2^{a-1}d_0$, and $d_0=2S_0-|H_{2^a}|=K_{2^a}$ by the p
 \end{proof}
 \leanline{\lean{level_trace}, in the form $\sum_{w<2^{a-1}}\sum_n\chi^{2w+1}(n)\langle n\rangle=2^{a-1}(pS_0-pS_{2^{a-1}})$; the
 identification of the sum over odd exponents with the field trace is the classical description of the Galois
-conjugates of $B_{1,\chi}$.}
+conjugates of $B_{1,\chi}$. The oddness of $K_{2^a}$ is \lean{level_parity} at $x=1$.}
 
 This is Theorem~1 of Murty and Thangadurai \cite{MT}, there read as a statement about the digits of $1/p$, and restated at
-the $2$-power levels by Girstmair \cite[Thm.~1]{GirMean}. At $a=2$ it is the trace in \eqref{eq:trnorm}; at level two, for
-$p\equiv3\pmod4$ and $p>3$, the same coset sum is $K_2=B_{1,\leg\cdot p}=-h(-p)$.
+the $2$-power levels by Girstmair \cite[Thm.~1]{GirMean}, whose formula is written with the first coordinate of $B_{1,\chi}$ in
+the power basis, that is, with $d_0$. At $a=2$ it is the trace in \eqref{eq:trnorm}. At level two (the case $a=1$, outside
+the present setting), for $p\equiv3\pmod4$ and $p>3$, the same coset sum is $K_2=B_{1,\leg\cdot p}=-h(-p)$ by Dirichlet's class
+number formula \cite[Ch.~4]{Washington}.
 
-\begin{example}[levels eight]\label{ex:eight}
+\begin{example}[level eight]\label{ex:eight}
 At $p=41$ ($a=3$), $H_8=\{1,10,16,18,37\}$ has sum $82=2\cdot41$, so $K_8=2\cdot2-5=-1$. At $p=73$ ($a=3$),
 $H_8=\{1,2,4,8,16,32,37,55,64\}$ has sum $219=3\cdot73$, so $K_8=6-9=-3$; with the primitive root $g=5$ and
 $\chi(5)=\zeta_8$, the coordinates are $(d_0,d_1,d_2,d_3)=(-3,-3,3,1)$, all odd.
 \end{example}
 
-Beyond these facts the higher levels enter the eighth- and sixteenth-range sums through \eqref{eq:suz} at $r=8$ and
-$r=16$, together with Bernoulli numbers of twists of conductor $8p$ and $16p$ \cite[\S10]{Berndt}, \cite{GirMean}; as at
-level four, these linear formulas do not order the conjugates.
+Beyond these facts, the eighth- and sixteenth-range sums of Berndt \cite[\S10]{Berndt} involve the quadratic character
+twisted by characters of conductor $8$ and $16$, that is, Bernoulli numbers of conductor $8p$ and $16p$, and Girstmair applies
+\eqref{eq:suz} to characters of order four and eight \cite[(27)]{GirMean}. As at level four, these linear formulas do not
+order the conjugates.
 
 \clearpage
 \section{Attribution register}\label{sec:register}
@@ -449,9 +456,10 @@ sign of $b$ selected by the pin: $b\equiv-2\pmod8$, i.e.\ $\chi(2)=i^{ab/2}$ & s
 coset-sum family and deviation vector; norm-type $L$-value product & \cite{GirAbh}, surveyed in \cite{GirSurv}\\
 digits of $1/p$ and $h(-p)$ & \cite{GirDig}; \cite[Satz 11]{GirPer}\\
 trace of first generalized Bernoulli numbers in the digit formula & \cite[Thm.~1]{MT}; \cite[Thm.~1]{GirMean}\\
-$B_{1,\psi}=0$ for even $\psi\ne1$ & \cite[\S4.1]{Washington}\\
+$B_{1,\psi}=0$ for even $\psi\ne1$ & \cite[Ch.~4]{Washington}\\
 integrality of coset sums of a nontrivial subgroup & \cite{GirAbh}, \cite{GirSurv}\\
-parity of the coordinates at levels $2^a\ge8$ & argument of Proposition~\ref{prop:odd}; not found in print\\
+parity of the first coordinate at every $2$-power level & \cite[remark after Thm.~1]{GirMeanVal}\\
+parity of the other coordinates at levels $2^a\ge8$ & argument of Proposition~\ref{prop:odd}; not found in print\\
 fixed-base twisted digit identity \eqref{eq:fixed} & \cite[Thm.~1]{GirSurv}\\
 digit frequencies as class numbers and classification of when this is possible & \cite{GirDecOct}; \cite{GirFreq}\\
 digit variance and Dedekind sums & \cite{GirVar97}; \cite{GirVar26}; \cite{GirMean}\\
@@ -502,17 +510,20 @@ Thm.~\ref{thm:recon}, formal part & \lean{reconstruction} & Reconstruction\\
 Prop.~\ref{prop:fixed} & \lean{fixed_base_collapse} & FixedBase\\
 \eqref{eq:suz} at $m=1$, $N=p$, $r=2$ & \lean{half_sum} & FixedBase\\
 Prop.~\ref{prop:even}, character and coset forms & \lean{even_T_eq_zero}, \lean{levelSum_even} & Levels\\
-Prop.~\ref{prop:levels}, integrality and pairing & \lean{p_dvd_levelSum}, \lean{levelSum_add_neg} & Levels\\
+Prop.~\ref{prop:levels}, integrality and pairing & \lean{p_dvd_levelSum}, \lean{levelSum_add_neg}, & Levels\\
+ & \lean{card_level_eq} & \\
+Prop.~\ref{prop:levels}, expansion $B_{1,\chi}=\sum d_r\zeta^r$ & \lean{level_expansion} & Levels\\
 Prop.~\ref{prop:levels}, parity & \lean{level_parity}, \lean{card_kernel_odd} & Levels\\
-Prop.~\ref{prop:trace} & \lean{level_trace} & Levels\\
+Prop.~\ref{prop:trace} & \lean{level_trace}, \lean{level_parity} & Levels\\
 \bottomrule
 \end{tabular}
 \end{center}
 
 Quoted and not formalized: the identification $\Nm(\beta)=2h^*(p)$ in Proposition~\ref{prop:data}, which needs relative class
 numbers of number fields; the $L$-value normalization of Section~\ref{sec:classical}; the general formula \eqref{eq:suz};
-the Remark $b\equiv-2\pmod8$, which needs the quartic character of $2$; the identification of the sum over odd exponents
-with the field trace in Proposition~\ref{prop:trace}; and the numerical Examples~\ref{ex:13} and~\ref{ex:eight}, which are
+the Remark $b\equiv-2\pmod8$, which needs the quartic character of $2$; the identification of the fibres $\{\chi=\zeta^r\}$ with the cosets $g^rH_{2^c}$
+in Section~\ref{sec:levels}; the identification of the sum over odd exponents with the field trace in
+Proposition~\ref{prop:trace}; and the numerical Examples~\ref{ex:13} and~\ref{ex:eight}, which are
 checked by direct computation.
 
 \section{Questions}\label{sec:questions}
@@ -605,6 +616,8 @@ Mathematics 84, Springer, New York, 1990.
 
 \bibitem{Washington} L.~C.~Washington, \emph{Introduction to Cyclotomic Fields}, 2nd ed., Graduate Texts in Mathematics 83,
 Springer, New York, 1997.
+
+\bibitem{GirMeanVal} K.~Girstmair, \emph{The mean value of the digits of $1/p$}, arXiv:2607.13663 (2026).
 
 \end{thebibliography}
 

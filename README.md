@@ -47,14 +47,16 @@ residues `n.val`.
 | Prop. 4.1 | `fixed_base_collapse` | FixedBase |
 | SUZ (6) at `m = 1, N = p, r = 2` | `half_sum` | FixedBase |
 | Prop. 5.1 (`B_{1,ψ} = 0` for even `ψ ≠ 1`; lower levels vanish) | `even_T_eq_zero`, `levelSum_even` | Levels |
-| Prop. 5.2 (integrality and pairing at level `2^a`) | `p_dvd_levelSum`, `levelSum_add_neg` | Levels |
+| Prop. 5.2 (integrality and pairing at level `2^a`) | `p_dvd_levelSum`, `levelSum_add_neg`, `card_level_eq` | Levels |
+| Prop. 5.2 (expansion `B_{1,χ} = Σ d_r ζ^r`) | `level_expansion` | Levels |
 | Prop. 5.2 (parity of the coordinates) | `level_parity`, `card_kernel_odd` | Levels |
-| Prop. 5.3 (level invariant, sum over odd exponents) | `level_trace` | Levels |
+| Prop. 5.3 (level invariant, sum over odd exponents; oddness) | `level_trace`, `level_parity` | Levels |
 
 Quoted, not formalized: `N(β) = 2h*(p)` (needs class numbers of number fields), the `L(1, χ)`
 normalization, the general Szmidt–Urbanowicz–Zagier formula, and `b ≡ -2 (mod 8)` under the pin
 (needs the quartic character of 2), and in Prop. 5.3 the identification of the sum over odd
-exponents with the field trace.
+exponents with the field trace, and the identification of the fibres `{χ = ζ^r}` with the cosets
+`g^r H`.
 
 ## Citation
 
