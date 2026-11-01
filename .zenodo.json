@@ -1,5 +1,5 @@
 {
-  "title": "KSurvey: Lean formalization of the quartic L-value survey",
+  "title": "KSurvey: a Lean 4 formalization of the quartic L-value survey",
   "upload_type": "software",
   "creators": [
     {
