@@ -62,9 +62,11 @@ exponents with the field trace, and the identification of the fibres `{χ = ζ^r
 
 Software: J. S. Farland, *KSurvey: Lean formalization of the quartic L-value survey*, Zenodo,
 2026, [doi:10.5281/zenodo.23624362](https://doi.org/10.5281/zenodo.23624362) (all versions; v1.0 is
-[doi:10.5281/zenodo.23624363](https://doi.org/10.5281/zenodo.23624363)). Version 1.1 adds `Levels`.
+[doi:10.5281/zenodo.23624363](https://doi.org/10.5281/zenodo.23624363)). Version 1.1, which adds `Levels`, is
+[doi:10.5281/zenodo.23849946](https://doi.org/10.5281/zenodo.23849946).
 
 Paper: J. S. Farland, *The coordinates of a quartic L-value: a formalized survey of the classical
 facts*, preprint, Zenodo, 2026, [doi:10.5281/zenodo.23624516](https://doi.org/10.5281/zenodo.23624516)
 (all versions; v1 is [doi:10.5281/zenodo.23624517](https://doi.org/10.5281/zenodo.23624517)).
-Version 2 of the survey (adds Section 5, the 2-power levels) is in `paper/` as LaTeX source and PDF.
+Version 2 of the survey (adds Section 5, the 2-power levels) is
+[doi:10.5281/zenodo.23850025](https://doi.org/10.5281/zenodo.23850025), and its LaTeX source and PDF are in `paper/`.
