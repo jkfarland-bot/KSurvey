@@ -60,7 +60,7 @@ exponents with the field trace, and the identification of the fibres `{χ = ζ^r
 
 ## Citation
 
-Software: J. S. Farland, *KSurvey: Lean formalization of the quartic L-value survey*, Zenodo,
+Software: J. S. Farland, *KSurvey: a Lean 4 formalization of the quartic L-value survey*, Zenodo,
 2026, [doi:10.5281/zenodo.23624362](https://doi.org/10.5281/zenodo.23624362) (all versions; v1.0 is
 [doi:10.5281/zenodo.23624363](https://doi.org/10.5281/zenodo.23624363)). Version 1.1, which adds `Levels`, is
 [doi:10.5281/zenodo.23849946](https://doi.org/10.5281/zenodo.23849946).
